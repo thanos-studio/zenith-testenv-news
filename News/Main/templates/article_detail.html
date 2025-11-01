@@ -1,0 +1,5 @@
+<h1>{{ article.title }}</h1>
+<p>{{ article.content }}</p>
+<p><small>발행일: {{ article.pub_date|date:"Y-m-d H:i" }}</small></p>
+
+<a href="{% url 'article_list' article.press.id %}">← 기사 목록으로 돌아가기</a>

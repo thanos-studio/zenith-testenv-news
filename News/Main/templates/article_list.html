@@ -1,0 +1,15 @@
+<h1>{{ press.name }}의 뉴스 목록</h1>
+<ul>
+    {% for article in articles %}
+        <li>
+            <a href="{% url 'article_detail' article.id %}">
+                {{ article.title }}
+            </a> 
+            <small>{{ article.pub_date|date:"Y-m-d H:i" }}</small>
+        </li>
+    {% empty %}
+        <li>아직 뉴스가 없습니다.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'press_list' %}">← 언론사 목록으로 돌아가기</a>

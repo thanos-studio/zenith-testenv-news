@@ -1,0 +1,13 @@
+<h1>언론사 목록</h1>
+<ul>
+    {% for press in presses %}
+        <li>
+            <a href="{% url 'article_list' press.id %}">
+                {% if press.logo %}
+                    <img src="{{ press.logo.url }}" width="50">
+                {% endif %}
+                {{ press.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
