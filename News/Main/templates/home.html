@@ -1,0 +1,9 @@
+<h1>테스트</h1>
+
+{% if request.user.is_authenticated %}
+    <p>로그인 계정: {{ request.user.username }}</p>
+    <a href="{% url 'logout' %}">로그아웃</a>
+{% else %}
+    <a href="{% url 'login' %}">로그인</a>
+    <a href="{% url 'signup' %}">회원가입</a>
+{% endif %}
