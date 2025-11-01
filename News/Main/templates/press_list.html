@@ -2,7 +2,7 @@
 <ul>
     {% for press in presses %}
         <li>
-            <a href="{% url 'article_list' press.id %}">
+            <a href="{% url 'Main:article_list' press.id %}">
                 {% if press.logo %}
                     <img src="{{ press.logo.url }}" width="50">
                 {% endif %}
