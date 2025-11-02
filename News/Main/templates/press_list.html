@@ -4,40 +4,60 @@
     <meta charset="UTF-8">
     <title>뉴스 페이지</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        header { background-color: #f2f2f2; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .login-buttons button { margin-left: 10px; }
-        .press-info { padding: 20px; background-color: #eaeaea; }
-        .subscribe-btn { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
-        .news-list { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .news-item { border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        .news-item a { text-decoration: none; color: black; font-weight: bold; }
-        .news-item p { margin: 5px 0; color: #555; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+        header { background-color: #fff; padding: 10px 20px; display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header .login-buttons button { margin-left: 10px; padding: 6px 12px; cursor: pointer; }
+        
+        .press-header { position: relative; background-color: #c00; color: white; padding: 40px 20px; margin-bottom: 20px; }
+        .press-header h1 { margin: 0; font-size: 32px; }
+        .press-header p { margin-top: 10px; font-size: 16px; }
+        .subscribe-btn { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 10px; }
+
+        .news-section { display: flex; flex-wrap: wrap; gap: 20px; padding: 0 20px 20px; }
+        .news-type { flex: 1 1 300px; background-color: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .news-type h2 { margin-top: 0; font-size: 20px; color: #333; margin-bottom: 10px; border-bottom: 2px solid #007BFF; padding-bottom: 5px; }
+
+        .news-item { margin-bottom: 10px; }
+        .news-item a { text-decoration: none; color: #000; font-weight: bold; display: block; }
+        .news-item p { font-size: 12px; color: #555; margin: 2px 0; }
+        .news-item img { max-width: 100%; margin-top: 5px; border-radius: 4px; }
+
+        @media (max-width: 900px) {
+            .news-section { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <h1>뉴스 페이지</h1>
-        </div>
-        <div class="login-buttons">
-            <a href="{% url 'login' %}"><button>로그인</button></a>
-            <a href="{% url 'signup' %}"><button>회원가입</button></a>
-        </div>
-    </header>
 
-    {% for press in presses %}
-    <h2>{{ press.name }}</h2>
-    <section class="press-info">
-        <form method="post" action="{% url 'Main:subscribe' press.id %}">
-            {% csrf_token %}
-            <button type="submit" class="subscribe-btn">언론사 구독하기</button>
-        </form>
-    </section>
-    {% endfor %}
+<header>
+    <div class="login-buttons">
+        <a href="{% url 'login' %}"><button>로그인</button></a>
+        <a href="{% url 'signup' %}"><button>회원가입</button></a>
+    </div>
+</header>
 
-    <section class="news-list">
-        {% for article in articles %}
+{% for press in presses %}
+<section class="press-header">
+    <h1>{{ press.name }}</h1>
+    
+    {% if press.logo %}
+        <img src="{{ press.logo.url }}" alt="{{ press.name }} 로고" class="press-logo">
+    {% else %}
+        <img src="/static/default-logo.jpg" alt="기본 로고" class="press-logo">
+    {% endif %}
+
+    <form method="post" action="{% url 'Main:subscribe' press.id %}">
+        {% csrf_token %}
+        <button type="submit" class="subscribe-btn">언론사 구독하기</button>
+    </form>
+</section>
+{% endfor %}
+
+<section class="news-section">
+    <!-- 뉴스 타입1 -->
+    <div class="news-type">
+        <h2>뉴스 목록 (타입1)</h2>
+        {% for article in articles|slice:":5" %}
         <div class="news-item">
             <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
             <p>{{ article.pub_date }}</p>
@@ -45,7 +65,37 @@
         {% empty %}
         <p>등록된 기사가 없습니다.</p>
         {% endfor %}
-    </section>
+    </div>
+
+    <!-- 뉴스 타입2 -->
+    <div class="news-type">
+        <h2>뉴스 목록 (타입2)</h2>
+        {% for article in articles|slice:"5:7" %}
+        <div class="news-item">
+            {% if article.image %}
+            <img src="{{ article.image.url }}" alt="뉴스 이미지">
+            {% endif %}
+            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
+        </div>
+        {% empty %}
+        <p>등록된 기사가 없습니다.</p>
+        {% endfor %}
+    </div>
+
+    <!-- 뉴스 타입3 -->
+    <div class="news-type">
+        <h2>뉴스 목록 (타입3)</h2>
+        {% for article in articles|slice:"7:12" %}
+        <div class="news-item">
+            <!-- 이미지 필드 없으므로 패스 -->
+            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
+            <p>{{ article.pub_date }}</p>
+        </div>
+        {% empty %}
+        <p>등록된 기사가 없습니다.</p>
+        {% endfor %}
+    </div>
+</section>
+
 </body>
 </html>
-

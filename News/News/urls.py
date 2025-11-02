@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from Main.views import home
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,3 +26,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('main/', include('Main.urls', namespace='Main')),
 ]
+
+# 개발 환경에서 미디어 파일 서비스
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

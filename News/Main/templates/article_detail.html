@@ -26,8 +26,7 @@
         <h1>{{ article.title }}</h1>
         <div class="article-meta">
             <span>{{ article.press.name }}</span> | 
-            <span>{{ article.journalist }}</span> | 
-            <span>{{ article.published_date }}</span>
+            <span>{{ article.pub_date }}</span>
         </div>
         <div class="article-body">
             {% if article.image %}
@@ -35,7 +34,8 @@
             {% endif %}
             <p>{{ article.content|linebreaks }}</p>
         </div>
-        <a href="{% url 'press_detail' article.press.id %}" class="back-btn">메인 페이지로 돌아가기</a>
+        <a href="{% url 'Main:press_list' %}" class="back-btn">메인 페이지로 돌아가기</a>
     </section>
 </body>
 </html>
+

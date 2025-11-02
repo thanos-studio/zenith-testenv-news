@@ -6,8 +6,8 @@ def home(request):
 
 def press_list(request):
     presses = Press.objects.all()
-    print(presses)
-    return render(request, 'press_list.html', {'presses': presses})
+    articles = Article.objects.all().order_by('-pub_date')  # 최신 순
+    return render(request, 'press_list.html', {'presses': presses, 'articles': articles})
 
 def subscribe(request, press_id):
     press = get_object_or_404(Press, id=press_id)
