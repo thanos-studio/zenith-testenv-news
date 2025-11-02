@@ -1,9 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Press(models.Model):
     name = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='press_logos/', blank=True, null=True)
+    subscribers = models.ManyToManyField(User, blank=True, related_name='subscribed_presses')
 
     def __str__(self):
         return self.name
