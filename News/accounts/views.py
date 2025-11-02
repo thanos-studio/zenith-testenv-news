@@ -9,14 +9,14 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('home')
+            return redirect('Main:press_list')
         else:
             return render(request, 'accounts/login.html', {'error': '아이디 또는 비밀번호가 틀렸습니다.'})
     return render(request, 'accounts/login.html')
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('Main:press_list')
 
 def signup_view(request):
     if request.method == "POST":
@@ -32,6 +32,6 @@ def signup_view(request):
 
         user = User.objects.create_user(username=username, password=password)
         login(request, user)  # 회원가입 후 자동 로그인
-        return redirect('home')
+        return redirect('Main:press_list')
 
     return render(request, 'accounts/signup.html')
