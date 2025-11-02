@@ -19,10 +19,10 @@ from django.urls import path, include
 from Main.views import home
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.shortcuts import render, redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', lambda request: redirect('Main:press_list')),
     path('accounts/', include('accounts.urls')),
     path('main/', include('Main.urls', namespace='Main')),
 ]
