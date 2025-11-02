@@ -1,13 +1,51 @@
-<h1>언론사 목록</h1>
-<ul>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>뉴스 페이지</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        header { background-color: #f2f2f2; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .login-buttons button { margin-left: 10px; }
+        .press-info { padding: 20px; background-color: #eaeaea; }
+        .subscribe-btn { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        .news-list { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .news-item { border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .news-item a { text-decoration: none; color: black; font-weight: bold; }
+        .news-item p { margin: 5px 0; color: #555; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>뉴스 페이지</h1>
+        </div>
+        <div class="login-buttons">
+            <a href="{% url 'login' %}"><button>로그인</button></a>
+            <a href="{% url 'signup' %}"><button>회원가입</button></a>
+        </div>
+    </header>
+
     {% for press in presses %}
-        <li>
-            <a href="{% url 'Main:article_list' press.id %}">
-                {% if press.logo %}
-                    <img src="{{ press.logo.url }}" width="50">
-                {% endif %}
-                {{ press.name }}
-            </a>
-        </li>
+    <h2>{{ press.name }}</h2>
+    <section class="press-info">
+        <form method="post" action="{% url 'Main:subscribe' press.id %}">
+            {% csrf_token %}
+            <button type="submit" class="subscribe-btn">언론사 구독하기</button>
+        </form>
+    </section>
     {% endfor %}
-</ul>
+
+    <section class="news-list">
+        {% for article in articles %}
+        <div class="news-item">
+            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
+            <p>{{ article.pub_date }}</p>
+        </div>
+        {% empty %}
+        <p>등록된 기사가 없습니다.</p>
+        {% endfor %}
+    </section>
+</body>
+</html>
+

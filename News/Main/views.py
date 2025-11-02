@@ -1,4 +1,4 @@
-from django.shortcuts import render , get_object_or_404
+from django.shortcuts import render , get_object_or_404,redirect
 from .models import Press, Article
 
 def home(request):
@@ -6,12 +6,14 @@ def home(request):
 
 def press_list(request):
     presses = Press.objects.all()
+    print(presses)
     return render(request, 'press_list.html', {'presses': presses})
 
-def article_list(request, press_id):
+def subscribe(request, press_id):
     press = get_object_or_404(Press, id=press_id)
-    articles = press.articles.all().order_by('-pub_date')
-    return render(request, 'article_list.html', {'press': press, 'articles': articles})
+    # 구독 로직 구현 (예: request.user가 구독 리스트에 추가)
+    # 예시: request.user.subscriptions.add(press)
+    return redirect('press_list')  # 구독 후 메인 페이지로 돌아가기
 
 def article_detail(request, article_id):
     article = get_object_or_404(Article, id=article_id)
