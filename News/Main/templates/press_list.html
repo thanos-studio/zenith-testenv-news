@@ -1,127 +1,87 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>뉴스 페이지</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
-        header { background-color: #fff; padding: 10px 20px; display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        header .login-buttons button { margin-left: 10px; padding: 6px 12px; cursor: pointer; }
-        
-        .press-header { position: relative; background-color: #c00; color: white; padding: 40px 20px; margin-bottom: 20px; }
-        .press-header h1 { margin: 0; font-size: 32px; }
-        .press-header p { margin-top: 10px; font-size: 16px; }
-        .subscribe-btn { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 10px; }
+{% extends 'base.html' %}
+{% block title %}뉴스 대시보드 · Zenith News{% endblock %}
 
-        .news-section { display: flex; flex-wrap: wrap; gap: 20px; padding: 0 20px 20px; }
-        .news-type { flex: 1 1 300px; background-color: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .news-type h2 { margin-top: 0; font-size: 20px; color: #333; margin-bottom: 10px; border-bottom: 2px solid #007BFF; padding-bottom: 5px; }
-
-        .news-item { margin-bottom: 10px; }
-        .news-item a { text-decoration: none; color: #000; font-weight: bold; display: block; }
-        .news-item p { font-size: 12px; color: #555; margin: 2px 0; }
-        .news-item img { max-width: 100%; margin-top: 5px; border-radius: 4px; }
-
-        @media (max-width: 900px) {
-            .news-section { flex-direction: column; }
-        }
-        .write-article-btn {
-            position: fixed;        /* 화면 고정 */
-            bottom: 30px;           /* 아래에서 30px 띄우기 */
-            right: 30px;            /* 오른쪽에서 30px 띄우기 */
-            background-color: #007BFF; /* 파란색 배경 */
-            color: white;           /* 글자색 흰색 */
-            padding: 15px 20px;     /* 버튼 안 여백 */
-            border-radius: 50px;    /* 둥근 모서리 */
-            text-decoration: none;  /* 밑줄 제거 */
-            font-weight: bold;      /* 글자 굵게 */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 그림자 */
-            transition: background-color 0.2s, transform 0.2s; /* 호버 애니메이션 */
-        }
-        .write-article-btn:hover {
-            background-color: #0056b3; /* 호버 시 색상 변경 */
-            transform: translateY(-3px); /* 살짝 위로 이동 */
-        }
-        .subscribe-btn.subscribed {
-            background-color: #555;   /* 구독함이면 회색 배경 */
-            color: white;              /* 글자 흰색 */
-            cursor: default;           /* 마우스 커서 기본 */
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="login-buttons">
-        <a href="{% url 'login' %}"><button>로그인</button></a>
-        <a href="{% url 'signup' %}"><button>회원가입</button></a>
+{% block content %}
+<section class="card hero">
+    <div>
+        <p class="eyebrow">오늘의 헤드라인</p>
+        <h1>많은 목소리가 모이는 뉴스 허브</h1>
+        <p class="muted">관심 있는 언론사를 구독하고, 직접 기사를 발행해보세요. 모든 콘텐츠는 마크다운 기반으로 안전하게 렌더링됩니다.</p>
     </div>
-</header>
-
-{% for press in presses %}
-<section class="press-header">
-    <h1>{{ press.name }}</h1>
-    
-    {% if press.logo %}
-        <img src="{{ press.logo.url }}" alt="{{ press.name }} 로고" class="press-logo">
-    {% else %}
-        <img src="/static/default-logo.jpg" alt="기본 로고" class="press-logo">
-    {% endif %}
-
-    <form method="post" action="{% url 'Main:subscribe' press.id %}">
-        {% csrf_token %}
-        {% if user.is_authenticated and user in press.subscribers.all %}
-            <button type="submit" class="subscribe-btn subscribed">구독함</button>
+    <div class="hero-actions">
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'Main:article_create' %}" class="btn btn-primary">기사 작성하기</a>
         {% else %}
-            <button type="submit" class="subscribe-btn">언론사 구독하기</button>
+            <a href="{% url 'signup' %}" class="btn btn-primary">지금 가입하기</a>
         {% endif %}
-    </form>
-</section>
-{% endfor %}
-
-<section class="news-section">
-    <!-- 뉴스 타입1 -->
-    <div class="news-type">
-        <h2>뉴스 목록 (타입1)</h2>
-        {% for article in articles|slice:":5" %}
-        <div class="news-item">
-            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
-            <p>{{ article.pub_date }}</p>
-        </div>
-        {% empty %}
-        <p>등록된 기사가 없습니다.</p>
-        {% endfor %}
     </div>
+</section>
 
-    <!-- 뉴스 타입2 -->
-    <div class="news-type">
-        <h2>뉴스 목록 (타입2)</h2>
-        {% for article in articles|slice:"5:7" %}
-        <div class="news-item">
+<section class="grid grid-3">
+    {% for article in primary_articles %}
+        <article class="card article-card">
+            <div class="article-meta">{{ article.press.name }} · {{ article.pub_date|date:'Y.m.d H:i' }}</div>
+            <h2><a href="{% url 'Main:article_detail' article.pk %}">{{ article.title }}</a></h2>
+            <p class="muted">{{ article.content|truncatewords:24 }}</p>
+            <a href="{% url 'Main:article_detail' article.pk %}" class="btn btn-secondary">자세히 보기</a>
+        </article>
+    {% empty %}
+        <p>등록된 기사가 없습니다. 첫 기사를 작성해보세요.</p>
+    {% endfor %}
+</section>
+
+<section class="grid grid-3">
+    {% for article in feature_articles %}
+        <article class="card article-card compact">
+            <div class="article-meta">{{ article.press.name }}</div>
+            <h3><a href="{% url 'Main:article_detail' article.pk %}">{{ article.title }}</a></h3>
             {% if article.image %}
-            <img src="{{ article.image.url }}" alt="뉴스 이미지">
+                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-thumb">
             {% endif %}
-            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
-        </div>
-        {% empty %}
-        <p>등록된 기사가 없습니다.</p>
-        {% endfor %}
-    </div>
-
-    <!-- 뉴스 타입3 -->
-    <div class="news-type">
-        <h2>뉴스 목록 (타입3)</h2>
-        {% for article in articles|slice:"7:12" %}
-        <div class="news-item">
-            <!-- 이미지 필드 없으므로 패스 -->
-            <a href="{% url 'Main:article_detail' article.id %}">{{ article.title }}</a>
-            <p>{{ article.pub_date }}</p>
-        </div>
-        {% empty %}
-        <p>등록된 기사가 없습니다.</p>
-        {% endfor %}
-    </div>
+        </article>
+    {% empty %}
+        <p>더 많은 기사를 곧 만나보실 수 있어요.</p>
+    {% endfor %}
 </section>
-<a href="{% url 'Main:article_create' %}" class="write-article-btn">기사 쓰기</a>
-</body>
-</html>
+
+<section class="grid grid-3">
+    {% for article in compact_articles %}
+        <article class="card thin">
+            <h4><a href="{% url 'Main:article_detail' article.pk %}">{{ article.title }}</a></h4>
+            <div class="article-meta">{{ article.pub_date|date:'m/d H:i' }}</div>
+        </article>
+    {% empty %}
+    {% endfor %}
+</section>
+
+<section class="grid grid-3">
+    {% for press in presses %}
+        <article class="card press-card">
+            <div class="press-card-header">
+                <div>
+                    <h3>{{ press.name }}</h3>
+                    <p class="press-meta">구독자 {{ press.subscribers.count }}명</p>
+                </div>
+                {% if press.logo %}
+                    <img src="{{ press.logo.url }}" class="press-logo" alt="{{ press.name }} 로고">
+                {% else %}
+                    <div class="press-logo placeholder">{{ press.name|slice:':1' }}</div>
+                {% endif %}
+            </div>
+            <form method="post" action="{% url 'Main:subscribe' press.pk %}" class="press-actions">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'Main:press_list' %}">
+                {% if request.user.is_authenticated and request.user in press.subscribers.all %}
+                    <button class="btn btn-secondary" type="submit">구독 중</button>
+                {% else %}
+                    <button class="btn btn-primary" type="submit" {% if not request.user.is_authenticated %}disabled{% endif %}>
+                        {% if request.user.is_authenticated %}구독하기{% else %}로그인 후 구독{% endif %}
+                    </button>
+                {% endif %}
+            </form>
+        </article>
+    {% empty %}
+        <p>등록된 언론사가 없습니다. 관리자에서 추가해주세요.</p>
+    {% endfor %}
+</section>
+{% endblock %}

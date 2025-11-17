@@ -1,37 +1,37 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
+from django.urls import reverse_lazy
+from django.views.generic import FormView
 
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('Main:press_list')
-        else:
-            return render(request, 'accounts/login.html', {'error': '아이디 또는 비밀번호가 틀렸습니다.'})
-    return render(request, 'accounts/login.html')
+from .forms import LoginForm, SignupForm
 
-def logout_view(request):
-    logout(request)
-    return redirect('Main:press_list')
 
-def signup_view(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        password2 = request.POST['password2']
+class LoginView(DjangoLoginView):
+    template_name = 'accounts/login.html'
+    authentication_form = LoginForm
+    redirect_authenticated_user = True
 
-        if password != password2:
-            return render(request, 'accounts/signup.html', {'error': '비밀번호가 일치하지 않습니다.'})
+    def form_valid(self, form):
+        messages.success(self.request, '환영합니다!')
+        return super().form_valid(form)
 
-        if User.objects.filter(username=username).exists():
-            return render(request, 'accounts/signup.html', {'error': '이미 존재하는 아이디입니다.'})
 
-        user = User.objects.create_user(username=username, password=password)
-        login(request, user)  # 회원가입 후 자동 로그인
-        return redirect('Main:press_list')
+class LogoutView(DjangoLogoutView):
+    next_page = reverse_lazy('Main:press_list')
 
-    return render(request, 'accounts/signup.html')
+
+class SignupView(FormView):
+    template_name = 'accounts/signup.html'
+    form_class = SignupForm
+    success_url = reverse_lazy('Main:press_list')
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        messages.success(self.request, '회원가입이 완료되었습니다.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, '입력 정보를 다시 확인해주세요.')
+        return super().form_invalid(form)

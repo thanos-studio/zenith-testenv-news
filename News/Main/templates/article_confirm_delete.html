@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}기사 삭제 · Zenith News{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h1>기사 삭제</h1>
+    <p class="muted">정말로 "{{ object.title }}" 기사를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
+    <form method="post" class="form-actions">
+        {% csrf_token %}
+        <a href="{{ object.get_absolute_url }}" class="btn btn-secondary">취소</a>
+        <button type="submit" class="btn btn-primary" style="background-color:#dc2626;">삭제하기</button>
+    </form>
+</section>
+{% endblock %}

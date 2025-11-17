@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zenith News{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-logo">
+            <a href="{% url 'Main:press_list' %}">Zenith News</a>
+        </div>
+        <nav class="site-nav">
+            {% if request.user.is_authenticated %}
+                <span class="nav-user">{{ request.user.username }} 님</span>
+                <a href="{% url 'Main:article_create' %}" class="btn btn-secondary">기사 작성</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-text">로그아웃</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-text">로그인</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary">회원가입</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main class="site-main">
+        {% if messages %}
+            <section class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <p>© {% now 'Y' %} Zenith News</p>
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

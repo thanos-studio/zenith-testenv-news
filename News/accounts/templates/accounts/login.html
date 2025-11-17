@@ -1,81 +1,23 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>로그인</title>
-<style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
+{% extends 'base.html' %}
+{% block title %}로그인 · Zenith News{% endblock %}
 
-  .login-container {
-    background: #fff;
-    padding: 40px 30px;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    width: 300px;
-    text-align: center;
-  }
-
-  .login-container h2 {
-    margin-bottom: 25px;
-    color: #333;
-  }
-
-  .login-container input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    transition: border 0.3s;
-  }
-
-  .login-container input:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-
-  .login-container button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  .login-container button:hover {
-    background-color: #0056b3;
-  }
-
-  .login-container p {
-    color: red;
-    margin-top: 10px;
-  }
-</style>
-</head>
-<body>
-
-<div class="login-container">
-  <h2>로그인</h2>
-  <form method="post">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="아이디">
-    <input type="password" name="password" placeholder="비밀번호">
-    <button type="submit">로그인</button>
-  </form>
-  {% if error %}<p>{{ error }}</p>{% endif %}
-</div>
-
-</body>
-</html>
+{% block content %}
+<section class="card auth-card">
+    <h1>로그인</h1>
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">로그인</button>
+        </div>
+    </form>
+    <p class="muted">아직 계정이 없으신가요? <a href="{% url 'signup' %}">회원가입</a></p>
+</section>
+{% endblock %}

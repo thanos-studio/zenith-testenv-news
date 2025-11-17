@@ -1,16 +1,56 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>기사 작성</title>
-</head>
-<body>
+{% block title %}기사 작성 · Zenith News{% endblock %}
+
+{% block extra_head %}
+    <style>
+        .editor-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="card">
     <h1>기사 작성</h1>
-    <form method="post" enctype="multipart/form-data">
+    <p class="markdown-helper">Markdown 문법을 이용해 다양한 서식을 활용할 수 있습니다. (예: `# 제목`, `**강조**`, `- 리스트`)</p>
+    <form method="post" enctype="multipart/form-data" class="editor-layout" data-preview-url="{% url 'Main:markdown_preview' %}">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">작성 완료</button>
+        <div class="form-grid">
+            <div class="form-field">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+            <div class="form-field">
+                {{ form.press.label_tag }}
+                {{ form.press }}
+                {{ form.press.errors }}
+            </div>
+            <div class="form-field">
+                {{ form.image.label_tag }}
+                {{ form.image }}
+                {{ form.image.errors }}
+            </div>
+            <div class="form-field">
+                {{ form.content.label_tag }}
+                {{ form.content }}
+                {{ form.content.errors }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">등록하기</button>
+            </div>
+        </div>
+        <div class="preview-panel">
+            <h3>실시간 미리보기</h3>
+            <div data-markdown-preview>미리보기 영역입니다. 내용을 입력하면 렌더링됩니다.</div>
+        </div>
     </form>
-</body>
-</html>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'js/markdown-preview.js' %}"></script>
+{% endblock %}
