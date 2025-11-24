@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from .renderers import MarkdownRenderer
 
-# Create your models here.
 class Press(models.Model):
     name = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='press_logos/', blank=True, null=True)

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ article.title }} · Zenith News{% endblock %}
 
 {% block content %}
@@ -22,4 +23,19 @@
         {% endif %}
     </div>
 </article>
+
+<section id="zenith-comments-container"></section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/zenith-comments.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('zenith-comments-container');
+        const threadId = '{{ article.pk }}';
+        const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+
+        new ZenithCommentsEmbed(container, threadId, isAuthenticated);
+    });
+</script>
 {% endblock %}

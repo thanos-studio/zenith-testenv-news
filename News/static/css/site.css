@@ -351,3 +351,21 @@ body {
         justify-content: flex-end;
     }
 }
+
+#zenith-comments-container {
+    margin-top: 2rem;
+    background-color: var(--surface);
+    border-radius: 1.25rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.zenith-loading, .zenith-error {
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+.zenith-error {
+    color: #c00;
+}

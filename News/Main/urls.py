@@ -4,6 +4,8 @@ from .views import (
     ArticleCreateView,
     ArticleDeleteView,
     ArticleDetailView,
+    CommentSessionView,
+    CommentUserView,
     MarkdownPreviewView,
     PressListView,
     PressSubscribeView,
@@ -18,4 +20,6 @@ urlpatterns = [
     path('article/<int:pk>/delete/', ArticleDeleteView.as_view(), name='article_delete'),
     path('articles/create/', ArticleCreateView.as_view(), name='article_create'),
     path('markdown/preview/', MarkdownPreviewView.as_view(), name='markdown_preview'),
+    path('api/comment-user/', CommentUserView.as_view(), name='comment_user'),
+    path('api/comment-session/', CommentSessionView.as_view(), name='comment_session'),
 ]

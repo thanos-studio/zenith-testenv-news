@@ -1,3 +1,8 @@
+import json
+import urllib.request
+import urllib.error
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect, JsonResponse
@@ -5,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView, DetailView, TemplateView, DeleteView
 
 from .forms import ArticleForm
@@ -96,3 +101,60 @@ class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.info(request, '기사를 삭제했습니다.')
         return super().delete(request, *args, **kwargs)
+
+
+def _zenith_request(endpoint: str, data: dict) -> dict:
+    url = f"{settings.ZENITH_API_URL}{endpoint}"
+    headers = {
+        'X-Site-Id': settings.ZENITH_SITE_ID,
+        'X-Site-Key': settings.ZENITH_SITE_KEY,
+        'Content-Type': 'application/json',
+    }
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(data).encode('utf-8'),
+        headers=headers,
+        method='POST'
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            return json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else ''
+        return {'error': True, 'status': e.code, 'message': error_body}
+    except urllib.error.URLError as e:
+        return {'error': True, 'message': str(e.reason)}
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CommentUserView(LoginRequiredMixin, View):
+    def post(self, request):
+        user = request.user
+        display_name = user.get_full_name() or user.username
+        data = {
+            'email': user.email or f'{user.username}@zenith.local',
+            'username': user.username,
+            'displayName': display_name,
+            'profilePictureUrl': None,
+            'metadata': {'djangoUserId': user.id}
+        }
+        result = _zenith_request('/api/comment/user', data)
+        if result.get('error'):
+            return JsonResponse(result, status=result.get('status', 500))
+        result['displayName'] = display_name
+        return JsonResponse(result)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CommentSessionView(LoginRequiredMixin, View):
+    def post(self, request):
+        try:
+            body = json.loads(request.body)
+            user_id = body.get('userId')
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'error': 'userId required'}, status=400)
+
+        result = _zenith_request('/api/comment/session', {'userId': user_id})
+        if result.get('error'):
+            return JsonResponse(result, status=result.get('status', 500))
+        return JsonResponse(result)

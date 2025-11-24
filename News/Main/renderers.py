@@ -3,8 +3,6 @@ import bleach
 
 
 class MarkdownRenderer:
-    """Render Markdown to sanitized HTML for safe display."""
-
     allowed_tags = [
         'a', 'abbr', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'p', 'pre',
         'strong', 'ul', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'hr'
